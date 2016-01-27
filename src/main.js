@@ -1,6 +1,6 @@
 'use strict';
 
-const electron = require('electron');
+import electron from 'electron';
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -28,12 +28,10 @@ function createWindow () {
         mainWindow = null;
     });
 
-    mainWindow.webContents.on('did-finish-load', () => {
-        setTimeout(() => {
-            mainWindow.webContents.send('dataLoaded', {patch: {menu: {pageSize: 5}}})
-            console.log("sended");
-        } , 1000)
-    });
+    electron.ipcMain.on("load-data", () => {
+        mainWindow.webContents.send('dataLoaded', {patch: {menu: {pageSize: 5}}})
+        console.log("sended")
+    })
 }
 
 // This method will be called when Electron has finished
