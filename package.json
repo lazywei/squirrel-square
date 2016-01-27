@@ -1,0 +1,37 @@
+{
+  "name": "squirrel-square",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "main": "./src/es6-init.js",
+  "scripts": {
+    "start": "electron ./src/es6-init.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazywei/squirrel-square.git"
+  },
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial"
+  ],
+  "author": "Chih-Wei Chang",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/lazywei/squirrel-square/issues"
+  },
+  "homepage": "https://github.com/lazywei/squirrel-square",
+  "devDependencies": {
+    "electron-compilers": "^2.0.5",
+    "electron-prebuilt": "^0.36.0"
+  },
+  "dependencies": {
+    "@cycle/core": "^6.0.0",
+    "@cycle/dom": "^9.0.2",
+    "babel-preset-es2015": "^6.3.13",
+    "electron-compile": "^2.0.6",
+    "js-yaml": "^3.5.2",
+    "rx": "^4.0.7"
+  }
+}
