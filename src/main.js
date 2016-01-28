@@ -29,7 +29,7 @@ function createWindow () {
     });
 
     electron.ipcMain.on("load-data", () => {
-        mainWindow.webContents.send('dataLoaded', {patch: {menu: {pageSize: 5}}})
+        setTimeout(() => mainWindow.webContents.send('dataLoaded', {patch: {menu: {pageSize: 5}}}), 1000)
         console.log("sended")
     })
 }
