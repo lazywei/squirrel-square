@@ -1,7 +1,11 @@
 import Rx from 'rx'
 import Cycle from '@cycle/core'
-import { makeDOMDriver, div, button, p, h1 } from '@cycle/dom'
+import { makeDOMDriver,
+         div, p, h1, button,
+         form, input, label, option, select,
+       } from '@cycle/dom'
 import electron from 'electron'
+import _ from 'lodash'
 
 function ipcDriver(request$) {
     request$.subscribe(req => electron.ipcRenderer.send(req.msg, req.payload))
@@ -38,15 +42,28 @@ function main(sources) {
     const data$ = sources.IPC;
 
     return {
-        DOM: data$.map(data =>
-                 div([
-                     h1('Menu'),
-                     p(`Page Size: ${data.patch.menu.pageSize}`),
-                     h1('Schema List'),
-                     data.patch.schemaList.map(({schema}) => p(schema)),
-                     button("Reload Data"),
-                 ])
-                ),
+        DOM: data$.map(
+            data =>
+                form([
+                    div('.form-group', [
+                        label('Page Size'),
+                        select('.form-control',
+                               _.range(1, 11).map(i => {
+                                   return option({selected: i === data.patch.menu.pageSize ?
+                                                  true : false}, i.toString())
+                               }))
+                    ])
+                    // div('.col-xs-6', [
+                    //     'Page Size',
+                    //     // p('Schema List'),
+                    // ]),
+                    // div('.col-xs-6', [
+                    //     input({type: 'text', value: data.patch.menu.pageSize})
+                    //     // data.patch.schemaList.map(({schema}) => p(schema)),
+                    // ]),
+                    // button("Reload Data"),
+                ])
+        ),
         IPC: request$,
     }
 }
