@@ -6,6 +6,11 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+import fs from 'fs'
+import path from 'path'
+import yaml from 'js-yaml'
+import humps from 'humps'
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -28,9 +33,10 @@ function createWindow () {
         mainWindow = null;
     });
 
-    electron.ipcMain.on("load-data", () => {
-        setTimeout(() => mainWindow.webContents.send('dataLoaded', {patch: {menu: {pageSize: 5}}}), 1000)
-        console.log("sended")
+    electron.ipcMain.on("load-data", (event, payload) => {
+        const filepath = path.join("/Users/lazywei/Library/Rime", payload.filename)
+        const data = humps.camelizeKeys(yaml.safeLoad(fs.readFileSync(filepath)))
+        mainWindow.webContents.send('ipc-driver-finished', data)
     })
 }
 

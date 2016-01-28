@@ -4,22 +4,17 @@ import { makeDOMDriver, div, button, p, h1 } from '@cycle/dom'
 import electron from 'electron'
 
 function ipcDriver(request$) {
-    request$.subscribe(msg => {
-        electron.ipcRenderer.send("load-data")
+    request$.subscribe(req => {
+        electron.ipcRenderer.send(req.msg, req.payload)
     })
 
     const ipc$ = Rx.Observable.create((observer) => {
         Rx.Observable
             .fromEvent(electron.ipcRenderer,
-                       'dataLoaded',
+                       'ipc-driver-finished',
                        (event, data) => data)
-            .subscribe((data) => {
-                observer.onNext(data)
-            })
+            .subscribe(data => observer.onNext(data))
 
-        // electron.ipcRenderer.on('dataLoaded', (event, data) => {
-        //     console.log('get Data')
-        // })
         return () => { console.log('disposed'); };
     })
     return ipc$;
@@ -33,20 +28,19 @@ function ipcDriver(request$) {
 // read effects are coming from sources
 
 function main(sources) {
-    const clickEv$ = sources.DOM.select('button')
-          .events('click')
+    const clickEv$ = sources.DOM.select('button').events('click')
     const request$ = clickEv$.map(() => {
-        return { filename: 'default.custom.yaml' }
+        return { msg: 'load-data', payload: { filename: 'default.custom.yaml' } }
     })
 
     const data$ = sources.IPC.startWith(null);
 
-    // setTimeout(() => electron.ipcRenderer.send("load-data"), 1000)
     return {
         DOM: data$.map(data =>
                  div([
                      h1('Menu'),
-                     data === null ? p('Page Size: ') : p(`Page Size: ${!data ? '' : data.patch.menu.pageSize}`),
+                     p(`Page Size: ${data === null ?
+                                     '' : data.patch.menu.pageSize}`),
                      button("Load Data"),
                  ])
                 ),
