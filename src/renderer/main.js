@@ -33,21 +33,32 @@ function main(sources) {
     const clickEv$ = sources.DOM.select('button')
           .events('click')
           .startWith({/* Fake a click event for initial loading*/})
-    const request$ = clickEv$.map(() => {
-        return {
-            msg: 'load-data',
-            payload: { filename: 'default.custom.yaml' }
-        }
-    })
-    const data$ = sources.IPC;
+    const request$ = clickEv$.map(
+        () => {
+            return {
+                msg: 'load-data',
+                payload: { filename: 'default.custom.yaml' }
+            }
+        })
+
+    const state$ = Rx.Observable.combineLatest(
+        sources.IPC.startWith(null),
+        sources.DOM.select('select#page-size')
+            .events('change')
+            .map(ev => ev.target.value)
+            .startWith("1"),
+        (data, selectedValue) => {
+            console.log(selectedValue)
+            return { data, selectedValue }
+        })
 
     return {
-        DOM: data$.map(
-            data =>
+        DOM: state$.map(
+            ({data, selectedValue}) =>
                 form([
                     div('.form-group', [
                         label('Page Size'),
-                        select('.form-control',
+                        data === null? null : select('.form-control#page-size',
                                _.range(1, 11).map(i => {
                                    return option({selected: i === data.patch.menu.pageSize ?
                                                   true : false}, i.toString())
